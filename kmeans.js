@@ -53,9 +53,14 @@ class KMeans {
 		return Math.sqrt(sumOfSquares);
 	}
 
-	run(points, verbose = false) {
-		// Start by picking k random centroids from our data set.
-		const randomCentroids = _.sample(points, this.k);
+	run(points, centroids = [], verbose = false) {
+		let startingCentroids;
+		if (centroids === []) {
+			// Start by picking k random centroids from our data set.
+			startingCentroids = _.sample(points, this.k);
+		} else {
+			startingCentroids = centroids;
+		}
 
 		// Initialise an empty array to store the calculated cluster centroids.
 		this.clusters = [];
@@ -63,7 +68,7 @@ class KMeans {
 		// Push an empty cluster to the array, and set its centroid coordinates to one of the random selections.
 		for (let i = 0; i < this.k; i++) {
 			this.clusters.push(new Cluster());
-			this.clusters[i].centroid = randomCentroids[i];
+			this.clusters[i].centroid = startingCentroids[i];
 			console.log(this.clusters[i].centroid);
 		}
 
@@ -84,7 +89,9 @@ class KMeans {
 			this.clusters.forEach((cluster) => {
 				cluster.calculateCentroid();
 
-				if (verbose) console.log(`Centroid: ${cluster.centroid}`);
+				if (verbose)
+					console.log(`Centroid: ${cluster.centroid}\nPoints: ${cluster.points}`);
+				cluster.points = [];
 			});
 
 			iterations++;
@@ -107,10 +114,36 @@ class KMeans {
 // 	[1, 4],
 // ];
 
-// let result = kMeans.run(dataSet, (verbose = true));
+// let result = kMeans.run(
+// 	dataSet,
+// 	(centroids = [
+// 		[2, 3],
+// 		[8, 7],
+// 	]),
+// 	(verbose = true),
+// );
 
 // result.forEach((cluster) => {
 // 	console.log(cluster.centroid);
 // });
 
-export { KMeans };
+let kMeans = new KMeans(2, 2);
+let dataSet = [
+	[1, 1],
+	[2, 1],
+	[4, 3],
+	[5, 4],
+];
+
+let result = kMeans.run(
+	dataSet,
+	(centroids = [
+		[1, 1],
+		[2, 1],
+	]),
+	(verbose = true),
+);
+
+result.forEach((cluster) => console.log(cluster));
+
+// export { KMeans };
